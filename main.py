@@ -1,6 +1,8 @@
 from tkinter import *
 from tkinter import ttk
 
+import os
+
 expr = ""
 aux = ""
 
@@ -60,6 +62,7 @@ if __name__ == "__main__":
     root = Tk()
     root.title("Basic Calculator")
     root.minsize(250, 300)
+    root.iconbitmap("calculator_icon.ico")
 
     style = ttk.Style()
     style.theme_use("clam")
