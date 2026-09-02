@@ -1,28 +1,37 @@
 from tkinter import *
 
 expr = ""
+aux = ""
 
 
 def press(key):
     global expr
+    global aux
     expr += str(key)
-    display.set(key)
+    if key != "+" and key != "-" and key != "*" and key != "/":
+        aux += str(key)
+        display.set(aux)
+    else:
+        aux = ""
+        display.set(key)
 
 
 def equal():
     global expr
+    global aux
     try:
         result = str(eval(expr))
         display.set(result)
-        expr = ""
+        expr = aux = ""
     except:
         display.set("error")
-        expr = ""
+        expr = aux = ""
 
 
 def clear():
     global expr
-    expr = ""
+    global aux
+    expr = aux = ""
     display.set("")
 
 
