@@ -18,7 +18,7 @@ This project consists of a calculator that performs basic arithmetic operations 
 ## Usage Instructions
 
 1. Clone the repository:
-   git clone https://github.com/your-username/Basic-Calculator.git
+   git clone https://github.com/joelng25/Basic-Calculator.git
 
 2. Navigate to the project folder:
    cd Basic-Calculator
@@ -36,7 +36,7 @@ This project consists of a calculator that performs basic arithmetic operations 
 ## Author
 
 Joel Novio
-GitHub: https://github.com/your-username
+GitHub: https://github.com/joelng25
 
 ## License
 
