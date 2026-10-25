@@ -1,123 +1,30 @@
-from tkinter import *
-from tkinter import ttk
-
 import os
+from tkinter import E, N, S, StringVar, Tk, W, ttk
 
-expr = ""
-aux = ""
+from calculator import Calculator
 
+FONT = ("Arial", 10, "bold")
 
-def press(key):
-    global expr
-    global aux
-    expr += str(key)
-    if key != "+" and key != "-" and key != "*" and key != "/":
-        aux += str(key)
-        display.set(aux)
-    else:
-        aux = ""
-        display.set(key)
+# style name -> (background, active, pressed)
+BUTTON_STYLES = {
+    "Number": ("#771096", "#4A075F", "#370746"),
+    "Operator": ("#3498db", "#2980b9", "#21618c"),
+    "Equals": ("#2ecc71", "#27ae60", "#229954"),
+    "Clear": ("#e67e22", "#d35400", "#ba4a00"),
+}
 
 
-def equal():
-    global expr
-    global aux
-    try:
-        result = str(eval(expr))
-        display.set(result)
-        expr = aux = ""
-    except:
-        display.set("error")
-        expr = aux = ""
-
-
-def clear():
-    global expr
-    global aux
-    expr = aux = ""
-    display.set("")
-
-
-def key_press(event):
-    key = event.char
-
-    if key in "0123456789.":
-        press(key)
-    elif key in "+-*/":
-        press(key)
-    elif key == "\r":
-        equal()
-    elif key == "\x1b":
-        clear()
-    elif key == "\x08":
-        global expr, aux
-        expr = expr[:-1]
-        aux = aux[:-1]
-        display.set(aux)
-
-    return "break"
-
-
-if __name__ == "__main__":
-    root = Tk()
-    root.title("Basic Calculator")
-    root.minsize(250, 300)
-    if os.path.exists("calculator_icon.ico"):
-        root.iconbitmap("calculator_icon.ico")
-
+def setup_styles() -> None:
     style = ttk.Style()
     style.theme_use("clam")
-    style.configure(
-        "Number.TButton",
-        font=("Arial", 10, "bold"),
-        foreground="white",
-        background="#771096",
-        padding=6,
-    )
-
-    style.map(
-        "Number.TButton",
-        background=[("active", "#4A075F"), ("pressed", "#370746")],
-        foregorund=[("active", "white")],
-    )
-
-    style.configure(
-        "Operator.TButton",
-        font=("Arial", 10, "bold"),
-        foreground="white",
-        background="#3498db",
-        padding=6,
-    )
-
-    style.map(
-        "Operator.TButton",
-        background=[("active", "#2980b9"), ("pressed", "#21618c")],
-    )
-
-    style.configure(
-        "Equals.TButton",
-        font=("Arial", 10, "bold"),
-        foreground="white",
-        background="#2ecc71",
-        padding=6,
-    )
-
-    style.map(
-        "Equals.TButton", background=[("active", "#27ae60"), ("pressed", "#229954")]
-    )
-
-    style.configure(
-        "Clear.TButton",
-        font=("Arial", 10, "bold"),
-        foreground="white",
-        background="#e67e22",
-        padding=6,
-    )
-
-    style.map(
-        "Clear.TButton", background=[("active", "#d35400"), ("pressed", "#ba4a00")]
-    )
-
+    for name, (bg, active, pressed) in BUTTON_STYLES.items():
+        style_name = f"{name}.TButton"
+        style.configure(style_name, font=FONT, foreground="white", background=bg, padding=6)
+        style.map(
+            style_name,
+            background=[("active", active), ("pressed", pressed)],
+            foreground=[("active", "white")],
+        )
     style.configure(
         "Display.TEntry",
         font=("Arial", 12, "bold"),
@@ -126,63 +33,79 @@ if __name__ == "__main__":
         padding=5,
     )
 
-    root.columnconfigure(0, weight=1)
-    root.rowconfigure(0, weight=1)
 
-    mainframe = ttk.Frame(root, padding="10")
-    mainframe.grid(column=0, row=0, sticky=(N, S, E, W))
+class CalculatorApp:
+    def __init__(self, root: Tk) -> None:
+        self.root = root
+        self.calc = Calculator()
+        self.display = StringVar()
+        self._build()
+        self._bind_keys()
 
-    display = StringVar()
-    entry = ttk.Entry(mainframe, textvariable=display, style="Display.TEntry")
-    entry.grid(column=0, row=0, columnspan=4, sticky=(W, E), pady=(0, 10))
-
-    numbers = [
-        (1, 2, 0),
-        (2, 2, 1),
-        (3, 2, 2),
-        (4, 3, 0),
-        (5, 3, 1),
-        (6, 3, 2),
-        (7, 4, 0),
-        (8, 4, 1),
-        (9, 4, 2),
-        (0, 5, 0),
-    ]
-
-    for num, row, col in numbers:
-        btn = ttk.Button(
-            mainframe,
-            text=str(num),
-            style="Number.TButton",
-            command=lambda n=num: press(n),
-        )
+    def _button(self, frame, text, style, command, row, col):
+        btn = ttk.Button(frame, text=text, style=f"{style}.TButton", command=command)
         btn.grid(row=row, column=col, sticky=(W, E), padx=2, pady=2)
 
-    operators = [("+", 2), ("-", 3), ("*", 4), ("/", 5)]
+    def _build(self) -> None:
+        self.root.columnconfigure(0, weight=1)
+        self.root.rowconfigure(0, weight=1)
+        frame = ttk.Frame(self.root, padding="10")
+        frame.grid(column=0, row=0, sticky=(N, S, E, W))
 
-    for op, row in operators:
-        btn = ttk.Button(
-            mainframe, text=op, style="Operator.TButton", command=lambda o=op: press(o)
-        )
-        btn.grid(row=row, column=3, sticky=(W, E), padx=2, pady=2)
+        entry = ttk.Entry(frame, textvariable=self.display, style="Display.TEntry")
+        entry.grid(column=0, row=0, columnspan=4, sticky=(W, E), pady=(0, 10))
 
-    doot = ttk.Button(
-        mainframe, text=".", command=lambda: press("."), style="Number.TButton"
-    )
-    doot.grid(row=6, column=0, sticky=(W, E), padx=2, pady=2)
-    eq = ttk.Button(mainframe, text="=", command=equal, style="Equals.TButton")
-    eq.grid(row=6, column=2, sticky=(W, E), padx=2, pady=2)
-    clear = ttk.Button(mainframe, text="Clear", command=clear, style="Clear.TButton")
-    clear.grid(row=6, column=1, sticky=(W, E), padx=2, pady=2)
+        for num in range(1, 10):
+            row, col = 2 + (num - 1) // 3, (num - 1) % 3
+            self._button(frame, str(num), "Number", lambda n=num: self.press(n), row, col)
+        self._button(frame, "0", "Number", lambda: self.press(0), 5, 0)
 
-    for col in range(4):
-        mainframe.columnconfigure(col, weight=1)
-    for row in range(7):
-        mainframe.rowconfigure(row, weight=1)
+        for row, op in enumerate("+-*/", start=2):
+            self._button(frame, op, "Operator", lambda o=op: self.press(o), row, 3)
 
-    root.bind("<Key>", key_press)
-    root.bind("<Return>", lambda e: equal())
-    root.bind("<KP_Enter>", lambda e: equal())
-    root.bind("<Escape>", lambda e: clear())
+        self._button(frame, ".", "Number", lambda: self.press("."), 6, 0)
+        self._button(frame, "Clear", "Clear", self.clear, 6, 1)
+        self._button(frame, "=", "Equals", self.equal, 6, 2)
+
+        for col in range(4):
+            frame.columnconfigure(col, weight=1)
+        for row in range(7):
+            frame.rowconfigure(row, weight=1)
+
+    def _bind_keys(self) -> None:
+        self.root.bind("<Key>", self.on_key)
+        self.root.bind("<Return>", lambda e: self.equal())
+        self.root.bind("<KP_Enter>", lambda e: self.equal())
+        self.root.bind("<Escape>", lambda e: self.clear())
+        self.root.bind("<BackSpace>", lambda e: self.display.set(self.calc.backspace()))
+
+    def press(self, key) -> None:
+        self.display.set(self.calc.press(key))
+
+    def equal(self) -> None:
+        self.display.set(self.calc.equal())
+
+    def clear(self) -> None:
+        self.display.set(self.calc.clear())
+
+    def on_key(self, event):
+        if event.char and event.char in "0123456789.+-*/":
+            self.press(event.char)
+        return "break"
+
+
+def main() -> None:
+    root = Tk()
+    root.title("Basic Calculator")
+    root.minsize(250, 300)
+    icon = os.path.join(os.path.dirname(os.path.abspath(__file__)), "calculator_icon.ico")
+    if os.path.exists(icon) and os.name == "nt":
+        root.iconbitmap(icon)
+    setup_styles()
+    CalculatorApp(root)
     root.focus()
     root.mainloop()
+
+
+if __name__ == "__main__":
+    main()

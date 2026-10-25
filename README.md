@@ -1,43 +1,49 @@
 # Basic Calculator
 
+[![CI](https://github.com/joelng25/basic-calculator/actions/workflows/ci.yml/badge.svg)](https://github.com/joelng25/basic-calculator/actions/workflows/ci.yml)
+
 A basic calculator made with Python and Tkinter.
 
 ## Description
 
-This project consists of a calculator that performs basic arithmetic operations such as addition, subtraction, multiplication, and division. It was created as a learning project to practice GUI development with Tkinter.
+A calculator for addition, subtraction, multiplication and division, built as a learning project to practice GUI development with Tkinter.
+
+The arithmetic logic lives in `calculator.py`, separate from the GUI in `main.py`. Expressions are evaluated with a small AST-based parser instead of `eval()`, so only numbers and `+ - * /` are accepted.
 
 ## Features
 
-- Basic operations
-- User-friendly interface with numeric and operation buttons
-- Keyboard input
-- Error handling
-- Resizable
-- Custom styles
+- Basic operations with operator precedence
+- Safe expression evaluation (no `eval()`)
+- Keyboard input (numbers, operators, Enter, Escape, Backspace)
+- Error handling (invalid input, division by zero)
+- Resizable window with custom styles
+- Unit tests and CI
 
-## Usage Instructions
+## Usage
 
-1. Clone the repository:
-   git clone https://github.com/joelng25/Basic-Calculator.git
+```bash
+git clone https://github.com/joelng25/basic-calculator.git
+cd basic-calculator
+python main.py
+```
 
-2. Navigate to the project folder:
-   cd Basic-Calculator
+- Click the buttons or type with the keyboard
+- Enter or `=` shows the result
+- Clear or Escape clears the display
+- Backspace deletes the last character
 
-3. Run the main file:
-   python main.py
+## Development
 
-4. Use the calculator:
-   - Click the buttons to enter numbers and operators
-   - You can also use the numeric keyboard
-   - Press Enter or the = button to see the result
-   - Use the Clear button or Escape key to clear the screen
-   - Use Backspace to delete the last character
+```bash
+pip install -r requirements-dev.txt
+ruff check .
+pytest
+```
 
 ## Author
 
-Joel Novio
-GitHub: https://github.com/joelng25
+Joel Novio — [github.com/joelng25](https://github.com/joelng25)
 
 ## License
 
-This project is under the MIT License - see the LICENSE file for more details.
+MIT — see [LICENSE](LICENSE).
