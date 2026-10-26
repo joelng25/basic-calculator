@@ -4,6 +4,8 @@
 
 A basic calculator made with Python and Tkinter.
 
+![Calculator app](docs/calculator.png)
+
 ## Description
 
 A calculator for addition, subtraction, multiplication and division, built as a learning project to practice GUI development with Tkinter.
